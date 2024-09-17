@@ -33,7 +33,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         configuration_url=product_link,
     )
 
-    # Lien d'achat
+    # Lien d'achat cliquable
     entity_registry.async_get_or_create(
         "sensor", DOMAIN, f"{name}_link",
         suggested_object_id=f"filament_{name.lower()}_link",
@@ -58,15 +58,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         "icon": "mdi:tag-text-outline"
     })
 
-    # Quantité (input_number)
-    hass.states.async_set(f"input_number.filament_{name.lower()}_stock", stock, {
-        "name": f"Stock de {name}",
+    # Input_number pour ajuster le stock de filament
+    input_number_config = {
         "min": 0,
         "max": 10000,
         "step": 1,
+        "mode": "box",
+        "name": f"Stock de {name}",
         "unit_of_measurement": "g",
         "icon": "mdi:weight"
-    })
+    }
+    hass.services.async_call("input_number", "set_value", {
+        "entity_id": f"input_number.filament_{name.lower()}_stock",
+        "value": stock
+    }, blocking=True)
 
     # Date de dernière modification
     last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
