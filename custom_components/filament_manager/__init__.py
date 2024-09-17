@@ -23,7 +23,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     entity_registry = er.async_get(hass)
 
     # Enregistrer le filament comme appareil
-    device_registry.async_get_or_create(
+    device = device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
         identifiers={(DOMAIN, name.lower().replace(' ', '_'))},
         manufacturer=brand,
@@ -33,22 +33,44 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         configuration_url=product_link,  # Lien direct vers le produit
     )
 
-    # Créer l'entité associée avec les attributs spécifiques
+    # Créer et associer les entités (quantité, marque, etc.) à l'appareil
+    # Quantité
     entity_registry.async_get_or_create(
-        DOMAIN, "filament_manager", name.lower().replace(' ', '_'),
-        suggested_object_id=f"filament_{name.lower().replace(' ', '_')}",
-        device_id=device_registry.async_get_device(identifiers={(DOMAIN, name.lower().replace(' ', '_'))}).id,
+        "sensor", DOMAIN, f"{name}_stock",
+        suggested_object_id=f"filament_{name.lower()}_stock",
+        device_id=device.id,
         config_entry=entry
     )
+    hass.states.async_set(f"sensor.filament_{name.lower()}_stock", stock, {
+        "unit_of_measurement": "g",
+        "friendly_name": f"Stock de {name}",
+        "device_class": "measurement"
+    })
 
-    # Définir les attributs supplémentaires
-    hass.states.async_set(f"{DOMAIN}.filament_{name.lower().replace(' ', '_')}", stock, {
-        "name": name,
-        "type": filament_type,
-        "stock": stock,
-        "brand": brand,
-        "product_link": product_link,
-        "link_text": "Acheter"
+    # Marque
+    entity_registry.async_get_or_create(
+        "sensor", DOMAIN, f"{name}_brand",
+        suggested_object_id=f"filament_{name.lower()}_brand",
+        device_id=device.id,
+        config_entry=entry
+    )
+    hass.states.async_set(f"sensor.filament_{name.lower()}_brand", brand, {
+        "friendly_name": f"Marque de {name}",
+    })
+
+    # Lien d'achat
+    entity_registry.async_get_or_create(
+        "sensor", DOMAIN, f"{name}_link",
+        suggested_object_id=f"filament_{name.lower()}_link",
+        device_id=device.id,
+        config_entry=entry
+    )
+    hass.states.async_set(f"sensor.filament_{name.lower()}_link", product_link, {
+        "friendly_name": f"Lien d'achat de {name}",
     })
 
     return True
+
+async def check_for_updates(hass: HomeAssistant):
+    """Vérifie si une mise à jour est disponible."""
+    # Logic to check for updates
