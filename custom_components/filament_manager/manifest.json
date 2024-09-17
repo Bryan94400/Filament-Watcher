@@ -1,0 +1,11 @@
+{
+    "domain": "filament_manager",
+    "name": "Filament Manager",
+    "version": "1.0.0",
+    "documentation": "https://github.com/ton_nom_utilisateur/filament_manager",
+    "requirements": [],
+    "dependencies": [],
+    "codeowners": ["@ton_nom_utilisateur"],
+    "iot_class": "local_polling"
+  }
+  
