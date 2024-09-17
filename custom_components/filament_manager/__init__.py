@@ -2,6 +2,7 @@ import logging
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.config_entries import ConfigEntry
+from datetime import datetime
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -9,7 +10,6 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Setup Filament Manager en enregistrant les informations fournies par l'utilisateur."""
 
-    # Récupérer les informations de l'entrée (ce que l'utilisateur a fourni)
     user_input = entry.data
     name = user_input["name"]
     filament_type = user_input["filament_type"]
@@ -17,15 +17,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     brand = user_input["brand"]
     product_link = user_input["product_link"]
 
-    # Récupérer le device_registry et entity_registry pour gérer les appareils et entités
-    device_registry = dr.async_get(hass)
-    entity_registry = er.async_get(hass)
-
-    # Vérifier que le lien d'achat commence par 'https://' ou 'http://'
     if not product_link.startswith(("http://", "https://")):
         product_link = "https://" + product_link
 
-    # Enregistrer le filament comme appareil
+    device_registry = dr.async_get(hass)
+    entity_registry = er.async_get(hass)
+
     device = device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
         identifiers={(DOMAIN, name.lower().replace(' ', '_'))},
@@ -33,31 +30,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         model=filament_type,
         name=name,
         sw_version="1.0",
-        configuration_url=product_link,  # Lien direct vers le produit
+        configuration_url=product_link,
     )
 
-    # Réduire la taille des informations pour les rendre plus concises
-    hass.states.async_set(f"{DOMAIN}.filament_{name.lower().replace(' ', '_')}", stock, {
-        "name": name,
-        "type": filament_type,
-        "stock": f"{stock} g",
-        "brand": brand,
-        "product_link": product_link,
-        "link_text": "Acheter"  # Remplacer 'Visiter' par 'Acheter'
-    })
-
-    # Créer et associer les entités (quantité, marque, etc.) à l'appareil
-    # Quantité
+    # Lien d'achat
     entity_registry.async_get_or_create(
-        "sensor", DOMAIN, f"{name}_stock",
-        suggested_object_id=f"filament_{name.lower()}_stock",
+        "sensor", DOMAIN, f"{name}_link",
+        suggested_object_id=f"filament_{name.lower()}_link",
         device_id=device.id,
         config_entry=entry
     )
-    hass.states.async_set(f"sensor.filament_{name.lower()}_stock", stock, {
-        "unit_of_measurement": "g",
-        "friendly_name": "Stock",
-        "device_class": "measurement"
+    hass.states.async_set(f"sensor.filament_{name.lower()}_link", product_link, {
+        "friendly_name": "Lien d'achat",
+        "icon": "mdi:link",
+        "custom_ui_more_info": {"tap_action": {"action": "url", "url_path": product_link}}
     })
 
     # Marque
@@ -69,22 +55,45 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
     hass.states.async_set(f"sensor.filament_{name.lower()}_brand", brand, {
         "friendly_name": "Marque",
+        "icon": "mdi:tag-text-outline"
     })
 
-    # Lien d'achat
+    # Quantité (input_number)
+    hass.states.async_set(f"input_number.filament_{name.lower()}_stock", stock, {
+        "name": f"Stock de {name}",
+        "min": 0,
+        "max": 10000,
+        "step": 1,
+        "unit_of_measurement": "g",
+        "icon": "mdi:weight"
+    })
+
+    # Date de dernière modification
+    last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     entity_registry.async_get_or_create(
-        "sensor", DOMAIN, f"{name}_link",
-        suggested_object_id=f"filament_{name.lower()}_link",
+        "sensor", DOMAIN, f"{name}_last_updated",
+        suggested_object_id=f"filament_{name.lower()}_last_updated",
         device_id=device.id,
         config_entry=entry
     )
-    hass.states.async_set(f"sensor.filament_{name.lower()}_link", product_link, {
-        "friendly_name": "Lien d'achat",
+    hass.states.async_set(f"sensor.filament_{name.lower()}_last_updated", last_updated, {
+        "friendly_name": "Dernière modification",
+        "device_class": "timestamp",
+        "icon": "mdi:clock"
+    })
+
+    # Quantité totale utilisée
+    total_used = 0
+    entity_registry.async_get_or_create(
+        "sensor", DOMAIN, f"{name}_total_used",
+        suggested_object_id=f"filament_{name.lower()}_total_used",
+        device_id=device.id,
+        config_entry=entry
+    )
+    hass.states.async_set(f"sensor.filament_{name.lower()}_total_used", total_used, {
+        "friendly_name": "Quantité totale utilisée",
+        "unit_of_measurement": "g",
+        "icon": "mdi:chart-bar"
     })
 
     return True
-
-async def check_for_updates(hass: HomeAssistant):
-    """Vérifie si une mise à jour est disponible."""
-    # Logic to check for updates
-    pass
