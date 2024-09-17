@@ -35,7 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         configuration_url=product_link,
     )
 
-    # Création du capteur pour le lien d'achat
+    # Capteur pour le lien d'achat
     entity_registry.async_get_or_create(
         "sensor", DOMAIN, f"{name}_link",
         suggested_object_id=f"filament_{name.lower()}_link",
@@ -53,7 +53,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         }
     })
 
-    # Création du capteur pour la marque
+    # Capteur pour la marque
     entity_registry.async_get_or_create(
         "sensor", DOMAIN, f"{name}_brand",
         suggested_object_id=f"filament_{name.lower()}_brand",
@@ -65,7 +65,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         "icon": "mdi:tag-text-outline"
     })
 
-    # Création du capteur pour la quantité totale utilisée
+    # Capteur pour la quantité totale utilisée
     total_used = 0
     entity_registry.async_get_or_create(
         "sensor", DOMAIN, f"{name}_total_used",
@@ -79,7 +79,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         "icon": "mdi:chart-bar"
     })
 
-    # Configuration d'`input_number` pour ajuster la quantité actuelle via service
+    # `input_number` pour ajuster la quantité actuelle via UI
     input_number_entity_id = f"input_number.filament_{name.lower()}_stock"
     input_number_config = {
         "min": 0,
@@ -94,7 +94,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     # Créer l'entité `input_number` pour la gestion du stock
     hass.states.async_set(input_number_entity_id, stock, input_number_config)
 
-    # Date de dernière modification
+    # Capteur pour la dernière modification
     last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     entity_registry.async_get_or_create(
         "sensor", DOMAIN, f"{name}_last_updated",
