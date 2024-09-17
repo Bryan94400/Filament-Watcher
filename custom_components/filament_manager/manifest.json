@@ -1,11 +1,10 @@
 {
     "domain": "filament_manager",
     "name": "Filament Manager",
-    "version": "1.0.3",
-    "documentation": "https://github.com/Bryan94400/Filament-Watcher",
+    "version": "1.0.0",
+    "documentation": "https://github.com/ton_repo/Filament-Watcher",
     "requirements": [],
-    "dependencies": [],
-    "codeowners": ["@Bryan94400"],
-    "iot_class": "local_polling",
+    "codeowners": ["@ton_nom_utilisateur_github"],
     "config_flow": true
-}
+  }
+  
