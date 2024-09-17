@@ -8,7 +8,7 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-GITHUB_API_URL = "https://api.github.com/repos/ton_nom_utilisateur_github/Filament-Watcher/releases/latest"
+GITHUB_API_URL = "https://api.github.com/repos/Bryan94400/Filament-Watcher/releases/latest"
 CURRENT_VERSION = "1.0.0"  # Version actuelle de ton plugin
 
 async def check_for_updates(hass: HomeAssistant):
