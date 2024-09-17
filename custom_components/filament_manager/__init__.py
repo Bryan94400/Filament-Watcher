@@ -4,10 +4,6 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity_component import EntityComponent
 from datetime import datetime
-from homeassistant.components.input_number import (
-    async_set_value,
-    DOMAIN as INPUT_NUMBER_DOMAIN,
-)
 
 from .const import DOMAIN
 
@@ -83,7 +79,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         "icon": "mdi:chart-bar"
     })
 
-    # Configuration d'`input_number` pour ajuster la quantité actuelle
+    # Configuration d'`input_number` pour ajuster la quantité actuelle via service
     input_number_entity_id = f"input_number.filament_{name.lower()}_stock"
     input_number_config = {
         "min": 0,
@@ -111,5 +107,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         "device_class": "timestamp",
         "icon": "mdi:clock"
     })
+
+    # Utilisation du service input_number pour ajuster la valeur
+    async def set_filament_stock(value):
+        await hass.services.async_call(
+            "input_number",
+            "set_value",
+            {"entity_id": input_number_entity_id, "value": value},
+            blocking=True,
+        )
 
     return True
