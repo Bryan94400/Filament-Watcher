@@ -16,6 +16,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     filament_type = user_input["filament_type"]
     stock = user_input["stock"]
     brand = user_input["brand"]
+    color = user_input["color"]
     product_link = user_input["product_link"]
 
     # Ensure the URL starts with http:// or https://
@@ -35,25 +36,32 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         configuration_url=product_link,
     )
 
-    # Capteur pour le lien d'achat
-    hass.states.async_set(f"sensor.filament_{name.lower()}_link", product_link, {
-        "friendly_name": "Lien d'achat",
-        "icon": "mdi:link",
-        "custom_ui_more_info": {
-            "tap_action": {
-                "action": "url",
-                "url_path": product_link
-            }
-        }
-    })
+    # Création des entités
 
-    # Capteur pour la marque
+    # Entité pour la marque
     hass.states.async_set(f"sensor.filament_{name.lower()}_brand", brand, {
         "friendly_name": "Marque",
         "icon": "mdi:tag-text-outline"
     })
 
-    # Capteur pour la quantité totale utilisée
+    # Entité pour la couleur
+    hass.states.async_set(f"sensor.filament_{name.lower()}_color", color, {
+        "friendly_name": "Couleur",
+        "icon": "mdi:palette"
+    })
+
+    # Entité pour la quantité réelle
+    input_number_entity_id = f"input_number.filament_{name.lower()}_stock"
+    hass.states.async_set(input_number_entity_id, stock, {
+        "friendly_name": f"Quantité réelle de {name}",
+        "min": 0,
+        "max": 10000,
+        "step": 1,
+        "unit_of_measurement": "g",
+        "icon": "mdi:weight"
+    })
+
+    # Entité pour la quantité utilisée
     total_used = 0
     hass.states.async_set(f"sensor.filament_{name.lower()}_total_used", total_used, {
         "friendly_name": "Quantité totale utilisée",
@@ -61,33 +69,44 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         "icon": "mdi:chart-bar"
     })
 
-    # Créer l'entité `input_number` pour ajuster la quantité actuelle via l'interface utilisateur
-    input_number_entity_id = f"input_number.filament_{name.lower()}_stock"
-    input_number_config = {
-        "min": 0,
-        "max": 10000,
-        "step": 1,
-        "mode": "box",
-        "name": f"Stock de {name}",
-        "unit_of_measurement": "g",
-        "icon": "mdi:weight"
-    }
-    hass.states.async_set(input_number_entity_id, stock, input_number_config)
+    # Entité pour l'URL du produit
+    hass.states.async_set(f"sensor.filament_{name.lower()}_url", product_link, {
+        "friendly_name": "Lien d'achat",
+        "icon": "mdi:link",
+        "url": product_link
+    })
 
-    # Capteur pour la dernière modification
+    # Entité pour la dernière modification
     last_updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    hass.states.async_set(f"sensor.filament_{name.lower()}_last_updated", last_updated, {
-        "friendly_name": "Dernière modification",
+    hass.states.async_set(f"sensor.filament_{name.lower()}_last_used", last_updated, {
+        "friendly_name": "Dernière utilisation",
         "device_class": "timestamp",
         "icon": "mdi:clock"
     })
 
-    # Utilisation du service input_number pour ajuster la valeur
+    # Input text pour modifier l'URL directement
+    input_text_url_entity_id = f"input_text.filament_{name.lower()}_url"
+    hass.states.async_set(input_text_url_entity_id, product_link, {
+        "friendly_name": f"URL du fournisseur pour {name}",
+        "icon": "mdi:web",
+        "mode": "text"
+    })
+
+    # Utilisation du service input_number pour ajuster la valeur du stock
     async def set_filament_stock(value):
         await hass.services.async_call(
             "input_number",
             "set_value",
             {"entity_id": input_number_entity_id, "value": value},
+            blocking=True,
+        )
+
+    # Utilisation du service input_text pour modifier l'URL
+    async def set_filament_url(url):
+        await hass.services.async_call(
+            "input_text",
+            "set_value",
+            {"entity_id": input_text_url_entity_id, "value": url},
             blocking=True,
         )
 
