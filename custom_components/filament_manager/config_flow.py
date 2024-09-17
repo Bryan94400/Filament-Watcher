@@ -1,7 +1,7 @@
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import selector
+from homeassistant.const import CONF_NAME
 from .const import DOMAIN
 
 @config_entries.HANDLERS.register(DOMAIN)
@@ -16,7 +16,7 @@ class FilamentManagerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             # Appeler la fonction pour créer le filament
             await self._create_filament(self.hass, user_input)
-            return self.async_create_entry(title="Filament Manager", data=user_input)
+            return self.async_create_entry(title=user_input["name"], data=user_input)
 
         # Définir le schéma pour les champs à remplir par l'utilisateur
         data_schema = vol.Schema({
@@ -42,11 +42,9 @@ class FilamentManagerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         product_link = user_input["product_link"]
 
         # Utiliser la fonction existante pour créer un filament
-        await hass.async_add_job(hass.services.call, DOMAIN, "add_filament", {
-            "name": name,
-            "filament_type": filament_type,
+        hass.states.async_set(f"{DOMAIN}.filament_{name}", stock, {
+            "type": filament_type,
             "color": color,
-            "stock": stock,
             "brand": brand,
             "product_link": product_link,
         })
