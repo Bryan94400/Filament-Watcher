@@ -41,8 +41,9 @@ class FilamentManagerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         brand = user_input["brand"]
         product_link = user_input["product_link"]
 
-        # Utiliser la fonction existante pour créer un filament
-        hass.states.async_set(f"{DOMAIN}.filament_{name}", stock, {
+        # Utiliser async_set pour s'assurer que l'entité est correctement ajoutée
+        hass.states.async_set(f"{DOMAIN}.filament_{name.lower().replace(' ', '_')}", stock, {
+            "name": name,
             "type": filament_type,
             "color": color,
             "brand": brand,
