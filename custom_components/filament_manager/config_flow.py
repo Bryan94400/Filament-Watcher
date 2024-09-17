@@ -46,6 +46,7 @@ class FilamentManagerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             "name": name,
             "type": filament_type,
             "color": color,
+            "stock": stock,  # Ajout de la quantité en tant qu'attribut
             "brand": brand,
             "product_link": product_link,
         })
