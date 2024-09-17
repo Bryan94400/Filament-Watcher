@@ -2,7 +2,7 @@
     "domain": "filament_manager",
     "name": "Filament Manager",
     "version": "1.0.0",
-    "documentation": "https://github.com/ton_nom_utilisateur/filament_manager",
+    "documentation": "https://github.com/Bryan94400/Filament-Watcher",
     "requirements": [],
     "dependencies": [],
     "codeowners": ["@Bryan94400"],
