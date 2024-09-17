@@ -41,12 +41,12 @@ class FilamentManagerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         brand = user_input["brand"]
         product_link = user_input["product_link"]
 
-        # Utiliser async_set pour s'assurer que l'entité est correctement ajoutée
+        # Utiliser async_set pour s'assurer que l'entité est correctement ajoutée avec les bons attributs
         hass.states.async_set(f"{DOMAIN}.filament_{name.lower().replace(' ', '_')}", stock, {
             "name": name,
             "type": filament_type,
             "color": color,
-            "stock": stock,  # Ajout de la quantité en tant qu'attribut
+            "stock": stock,
             "brand": brand,
             "product_link": product_link,
         })
