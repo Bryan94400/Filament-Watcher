@@ -43,7 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
     hass.states.async_set(f"sensor.filament_{name.lower()}_stock", stock, {
         "unit_of_measurement": "g",
-        "friendly_name": f"Stock de {name}",
+        "friendly_name": "Stock",
         "device_class": "measurement"
     })
 
@@ -55,7 +55,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         config_entry=entry
     )
     hass.states.async_set(f"sensor.filament_{name.lower()}_brand", brand, {
-        "friendly_name": f"Marque de {name}",
+        "friendly_name": "Marque",
     })
 
     # Lien d'achat
@@ -66,7 +66,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         config_entry=entry
     )
     hass.states.async_set(f"sensor.filament_{name.lower()}_link", product_link, {
-        "friendly_name": f"Lien d'achat de {name}",
+        "friendly_name": "Lien d'achat",
     })
 
     return True
@@ -74,3 +74,4 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def check_for_updates(hass: HomeAssistant):
     """Vérifie si une mise à jour est disponible."""
     # Logic to check for updates
+    pass
