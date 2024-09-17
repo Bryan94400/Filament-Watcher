@@ -1,31 +1,20 @@
-from homeassistant.helpers.entity import Entity
-from homeassistant.const import CONF_NAME
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up the filament sensors."""
-    sensors = []
-    sensors.append(FilamentSensor("Filament Color", "blue", 5))  # Exemple de capteur
-    async_add_entities(sensors)
+from .const import DOMAIN
 
-class FilamentSensor(Entity):
-    """Representation of a filament sensor."""
+async def async_setup(hass: HomeAssistant, config: dict):
+    """Set up the Filament Manager component."""
+    hass.data[DOMAIN] = {}
+    return True
 
-    def __init__(self, name, color, quantity):
-        self._name = name
-        self._color = color
-        self._quantity = quantity
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Set up Filament Manager from a config entry."""
+    hass.data[DOMAIN][entry.entry_id] = entry.data
+    # Ici, on peut initialiser tout ce qui est nécessaire, par exemple les capteurs ou le suivi de filament
+    return True
 
-    @property
-    def name(self):
-        """Return the name of the sensor."""
-        return f"{self._name} ({self._color})"
-
-    @property
-    def state(self):
-        """Return the state of the sensor."""
-        return self._quantity
-
-    @property
-    def icon(self):
-        """Return the icon for the sensor."""
-        return "mdi:printer-3d"  # Choisis une icône appropriée
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Handle removal of an entry."""
+    hass.data[DOMAIN].pop(entry.entry_id)
+    return True
