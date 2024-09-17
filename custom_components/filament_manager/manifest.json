@@ -1,7 +1,7 @@
 {
     "domain": "filament_manager",
     "name": "Filament Manager",
-    "version": "1.0.0",
+    "version": "1.0.13",
     "documentation": "https://github.com/ton_repo/Filament-Watcher",
     "requirements": [],
     "codeowners": ["@ton_nom_utilisateur_github"],
