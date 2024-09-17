@@ -1,33 +1,30 @@
 from homeassistant.helpers.entity import Entity
-from homeassistant import config_entries
-from homeassistant.const import CONF_NAME
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up the filament sensors."""
-    sensors = []
-    # Exemple de capteur pour le stock de filament
-    sensors.append(FilamentSensor("Filament Color", "blue", 5))  # Exemple de couleur et quantité
-    async_add_entities(sensors)
+class FilamentStockSensor(Entity):
+    """Capteur pour suivre le stock de filament."""
 
-class FilamentSensor(Entity):
-    """Representation of a filament sensor."""
-
-    def __init__(self, name, color, quantity):
+    def __init__(self, name, filament_type, initial_stock):
+        """Initialise le capteur."""
         self._name = name
-        self._color = color
-        self._quantity = quantity
+        self._filament_type = filament_type
+        self._stock = initial_stock
 
     @property
     def name(self):
-        """Return the name of the sensor."""
-        return f"{self._name} ({self._color})"
+        """Nom du capteur."""
+        return self._name
 
     @property
     def state(self):
-        """Return the state of the sensor."""
-        return self._quantity
+        """Retourne l'état actuel (le stock)."""
+        return self._stock
 
     @property
-    def icon(self):
-        """Return the icon for the sensor."""
-        return "mdi:printer-3d"  # Choisis une icône appropriée
+    def unit_of_measurement(self):
+        """Unité de mesure (grammes)."""
+        return "g"
+
+    def update_stock(self, new_stock):
+        """Mise à jour du stock."""
+        self._stock = new_stock
+        self.schedule_update_ha_state()
