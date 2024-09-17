@@ -19,14 +19,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     entity_registry = er.async_get(hass)
 
     # Exemple de création d'un filament enregistré comme appareil
-    # Assurons-nous d'inclure tous les attributs
     filament_name = "Wanhao Blanc"  # Remplacer par la variable appropriée
     filament_type = "PLA"            # Exemple d'attribut
     stock = 1200                     # Quantité actuelle en grammes
     brand = "Filament Premium"       # Marque
     product_link = "https://example.com/product-link"  # Lien du produit
 
-    # Enregistrer le filament comme appareil
+    # Enregistrer le filament comme appareil avec un lien affiché comme "Acheter"
     device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
         identifiers={(DOMAIN, filament_name.lower().replace(' ', '_'))},  # ID unique pour l'appareil
@@ -46,13 +45,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         config_entry=entry
     )
 
-    # Définir les attributs supplémentaires
+    # Définir les attributs supplémentaires, y compris le lien du produit sous "Acheter"
     hass.states.async_set(f"{DOMAIN}.filament_{filament_name.lower().replace(' ', '_')}", stock, {
         "name": filament_name,
         "type": filament_type,
         "stock": stock,
         "brand": brand,
         "product_link": product_link,
+        "link_text": "Acheter"
     })
 
     return True
