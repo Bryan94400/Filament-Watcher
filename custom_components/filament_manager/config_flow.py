@@ -14,7 +14,7 @@ class FilamentManagerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle the initial step."""
         errors = {}
         if user_input is not None:
-            # Appeler la fonction pour créer le filament
+            # Appeler la fonction pour créer le filament avec les informations fournies par l'utilisateur
             await self._create_filament(self.hass, user_input)
             return self.async_create_entry(title=user_input["name"], data=user_input)
 
@@ -33,7 +33,7 @@ class FilamentManagerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def _create_filament(self, hass: HomeAssistant, user_input):
-        """Crée un nouveau filament via la config flow."""
+        """Crée un nouveau filament via la config flow en utilisant les informations de l'utilisateur."""
         name = user_input["name"]
         filament_type = user_input["filament_type"]
         color = user_input["color"]
@@ -41,7 +41,7 @@ class FilamentManagerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         brand = user_input["brand"]
         product_link = user_input["product_link"]
 
-        # Utiliser async_set pour s'assurer que l'entité est correctement ajoutée avec les bons attributs
+        # Utiliser async_set pour s'assurer que l'entité est correctement ajoutée
         hass.states.async_set(f"{DOMAIN}.filament_{name.lower().replace(' ', '_')}", stock, {
             "name": name,
             "type": filament_type,
