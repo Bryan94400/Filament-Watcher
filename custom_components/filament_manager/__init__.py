@@ -2,7 +2,6 @@ import logging
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.entity import Entity
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -22,6 +21,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
 
+    # Vérifier que le lien d'achat commence par 'https://' ou 'http://'
+    if not product_link.startswith(("http://", "https://")):
+        product_link = "https://" + product_link
+
     # Enregistrer le filament comme appareil
     device = device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
@@ -32,6 +35,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         sw_version="1.0",
         configuration_url=product_link,  # Lien direct vers le produit
     )
+
+    # Réduire la taille des informations pour les rendre plus concises
+    hass.states.async_set(f"{DOMAIN}.filament_{name.lower().replace(' ', '_')}", stock, {
+        "name": name,
+        "type": filament_type,
+        "stock": f"{stock} g",
+        "brand": brand,
+        "product_link": product_link,
+        "link_text": "Acheter"  # Remplacer 'Visiter' par 'Acheter'
+    })
 
     # Créer et associer les entités (quantité, marque, etc.) à l'appareil
     # Quantité
